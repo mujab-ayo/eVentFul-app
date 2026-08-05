@@ -7,7 +7,9 @@ const registerUserController = async (req: Request, res: Response) => {
 
     const user = await registerUser(name, email, password);
 
-    res.status(201).json( user );
+    const { hashedPassword, ...publicUserDatails } = user.toObject();
+
+    res.status(201).json(publicUserDatails);
   } catch (error) {
     if (error instanceof Error) {
       res.status(400).json({ message: error.message });
@@ -21,9 +23,11 @@ const loginUserController = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    const {token, user} = await loginUser(email, password);
+    const { token, user } = await loginUser(email, password);
 
-    res.status(200).json({ token, user });
+    const { hashedPassword, ...publicUserDatails } = user.toObject();
+
+    res.status(200).json({ token, user: publicUserDatails });
   } catch (error) {
     if (error instanceof Error) {
       res.status(401).json({ message: error.message });
