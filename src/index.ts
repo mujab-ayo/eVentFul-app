@@ -1,6 +1,7 @@
 import "dotenv/config";
 import connectDB from "./config/db.js";
 import authRoutes from "./routes/authRoutes.js";
+import eventRoutes from "./routes/eventRoutes.js";
 
 import express from "express";
 const app = express();
@@ -13,6 +14,8 @@ app.get("/health", (req, res) => {
 });
 
 app.use("/auth", authRoutes);
+
+app.use("/events", eventRoutes);
 
 await connectDB();
 
