@@ -17,4 +17,21 @@ const getAllEvents = async () => {
   return events;
 }
 
-export { createEvent, getAllEvents };
+
+const getEventById = async (eventId: string) => {
+  const event = await Event.findById(eventId);
+
+  if (!event) {
+    throw new Error("Event not found");
+  }
+
+  return event;
+};
+
+
+const updateEvent = async (eventId: string, eventData: Partial<EventInput>) => {
+
+
+}
+
+export { createEvent, getAllEvents, getEventById, updateEvent };
