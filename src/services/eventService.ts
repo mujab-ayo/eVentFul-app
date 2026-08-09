@@ -39,7 +39,7 @@ const updateEvent = async (
 
   const eventAccess =
     event.createdBy.toString() === userId ||
-    event.collaborators.some((collab) => collab.userId?.toString() === userId );
+    event.collaborators.some((collab) => collab.userId?.toString() === userId);
 
   if (!eventAccess) {
     throw new Error("Not authorized to update this event");
@@ -47,9 +47,29 @@ const updateEvent = async (
 
   Object.assign(event, updateData);
 
-  await event.save()
+  await event.save();
 
   return event;
 };
 
-export { createEvent, getAllEvents, getEventById, updateEvent };
+const deleteEvent = async (eventId: string, id: string) => {
+  const event = await Event.findById(eventId);
+
+  if (!event) {
+    throw new Error("Event does not exist");
+  }
+
+  const eventAccess =
+    event.createdBy.toString() === id ||
+    event.collaborators.some((collab) => collab.userId?.toString() === id);
+
+  if (!eventAccess) {
+    throw new Error("Not authorized to delete this event");
+  }
+
+  await Event.findByIdAndDelete(eventId);
+
+  return { message: "Event deleted successfully" };
+};
+
+export { createEvent, getAllEvents, getEventById, updateEvent, deleteEvent };

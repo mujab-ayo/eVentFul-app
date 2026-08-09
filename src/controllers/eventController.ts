@@ -3,6 +3,7 @@ import {
   getAllEvents,
   getEventById,
   updateEvent,
+  deleteEvent,
 } from "../services/eventService.js";
 import type { Request, Response } from "express";
 
@@ -96,3 +97,38 @@ export const updateEventController = async (req: Request, res: Response) => {
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
+export const deleteEventController = async (req: Request, res: Response) => {
+  try {
+    const id = req.user?.id;
+
+    if (!id) {
+      return res.status(401).json("unauthorized");
+    }
+
+    const eventId = req.params.id;
+
+    if (typeof eventId !== "string") {
+      return res.status(404).json("event not found");
+    }
+
+    const del = await deleteEvent(eventId, id);
+
+    return res.status(200).json(del);
+  } catch (error) {
+     if (error instanceof Error && error.message === "Event does not exist") {
+      return res.status(404).json({ error: error.message });
+    }
+    if (
+      error instanceof Error &&
+      error.message === "Not authorized to delete this event"
+    ) {
+      return res.status(403).json({ error: error.message });
+    }
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+  }
+
