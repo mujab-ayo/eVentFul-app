@@ -32,3 +32,8 @@ export const createOrder = async (
 
   return order;
 };
+
+
+export const getMyOrder = async (buyerId: string) => {
+    return await Order.find({ buyerId });
+};

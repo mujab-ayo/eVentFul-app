@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 
-import { createOrder } from "../services/orderService.js";
+import { createOrder, getMyOrder } from "../services/orderService.js";
 
 export const createOrderController = async (req: Request, res: Response) => {
   try {
@@ -41,6 +41,25 @@ export const createOrderController = async (req: Request, res: Response) => {
       return res.status(400).json({ error: error.message });
     }
 
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getMyOrderController = async (req: Request, res: Response) => {
+  try {
+    const id = req.user?.id;
+
+    if (!id) {
+      return res.status(401).json("Unauthorized");
+    }
+
+    const myOrder = await getMyOrder(id);
+
+    return res.status(200).json(myOrder);
+  } catch (error) {
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
     return res.status(500).json({ error: "Internal Server Error" });
   }
 };
