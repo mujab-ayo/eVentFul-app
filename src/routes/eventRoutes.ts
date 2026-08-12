@@ -8,9 +8,13 @@ import {
   addCollaboratorController,
   toggleCollaboratorController,
   removeCollaboratorController,
+ 
 } from "../controllers/eventController.js";
 
-import { createOrderController } from "../controllers/orderController.js";
+import {
+  createOrderController,
+  getOrdersForEventController,
+} from "../controllers/orderController.js";
 
 import authMiddleware from "../middleware/authMiddleware.js";
 
@@ -41,5 +45,7 @@ router.delete(
 );
 
 router.post("/:id/orders", authMiddleware, createOrderController);
+
+router.get("/:id/orders", authMiddleware, getOrdersForEventController);
 
 export default router;
