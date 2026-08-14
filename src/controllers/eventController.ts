@@ -6,8 +6,11 @@ import {
   deleteEvent,
   addCollaborator,
   toggleCollaboratorOwner,
-  removeCollaborator
+  removeCollaborator,
 } from "../services/eventService.js";
+
+import { getSharableEvent } from "../services/ticketService.js";
+
 import type { Request, Response } from "express";
 
 export const createEventController = async (req: Request, res: Response) => {
@@ -240,8 +243,10 @@ export const toggleCollaboratorController = async (
   }
 };
 
-
-export const removeCollaboratorController = async (req: Request, res: Response) => {
+export const removeCollaboratorController = async (
+  req: Request,
+  res: Response,
+) => {
   try {
     const id = req.user?.id;
 
@@ -264,6 +269,50 @@ export const removeCollaboratorController = async (req: Request, res: Response) 
     const result = await removeCollaborator(eventId, id, targetUserId);
 
     return res.status(201).json(result);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "This user is not a collaborator"
+    ) {
+      return res.status(404).json({ error: error.message });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "Only owners can add collaborators"
+    ) {
+      return res.status(403).json({ error: error.message });
+    }
+
+    if (
+      error instanceof Error &&
+      error.message === "Cannot delete the last remaining owner"
+    ) {
+      return res.status(409).json({ error: error.message });
+    }
+
+    if (error instanceof Error) {
+      return res.status(400).json({ error: error.message });
+    }
+
+    return res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const getSharableEventController = async (
+  req: Request,
+  res: Response,
+) => {
+  try {
+    const eventId = req.params.id;
+
+    if (typeof eventId !== "string") {
+      return res.status(404).json("Event does not exist");
+    }
+
+    const link = await getSharableEvent(eventId);
+
+    return res.status(200).json(link);
   } catch (error) {
     if (
       error instanceof Error &&

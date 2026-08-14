@@ -8,7 +8,7 @@ import {
   addCollaboratorController,
   toggleCollaboratorController,
   removeCollaboratorController,
- 
+  getSharableEventController,
 } from "../controllers/eventController.js";
 
 import {
@@ -47,5 +47,7 @@ router.delete(
 router.post("/:id/orders", authMiddleware, createOrderController);
 
 router.get("/:id/orders", authMiddleware, getOrdersForEventController);
+
+router.get("/:id/share", getSharableEventController);
 
 export default router;
