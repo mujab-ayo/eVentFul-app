@@ -85,12 +85,76 @@ export const initializePayment = async (orderId: string, userEmail: string) => {
 
   const data = await response.json();
 
-  if (!data) {
+  if (!data.status) {
     throw new Error("Failed to initialize payment");
   }
+
+  order.paystackReference = data.data.reference;
+
+  await order.save();
 
   return {
     authorizationUrl: data.data.authorization_url,
     reference: data.data.reference,
   };
+};
+
+export const verifyPayment = async (reference: string) => {
+  if (!process.env.PAYSTACK_SECRET_KEY) {
+    throw new Error("Payment service is not configured");
+  }
+
+  const response = await fetch(
+    `https://api.paystack.co/transaction/verify/${reference}`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.PAYSTACK_SECRET_KEY}`,
+        "Content-Type": "application/json",
+      },
+    },
+  );
+
+  const data = await response.json();
+
+  if (!data.status) {
+    throw new Error("Failed to verify payment");
+  }
+
+  if (data.data.status !== "success") {
+    throw new Error("Payment was not successful");
+  }
+
+  const order = await Order.findOne({ paystackReference: reference });
+
+  if (!order) {
+    throw new Error("Order not found for this reference");
+  }
+
+  const event = await getEventById(order.eventId.toString());
+
+  const existingTicketCount = await Ticket.countDocuments({ eventId: order.eventId });
+
+  if (existingTicketCount + order.ticketQuantity > event.expectedAttendees) {
+    order.status = "failed";
+    await order.save();
+    throw new Error("Tickets are no longer available");
+  }
+
+  order.status = "paid";
+  await order.save();
+
+  const ticketsToCreate = Array.from({ length: order.ticketQuantity }).map(() =>
+    Ticket.create({
+      orderId: order._id,
+      eventId: order.eventId,
+      attendeeUserId: order.buyerId,
+      qrCodeToken: crypto.randomUUID(),
+    })
+  );
+
+  const tickets = await Promise.all(ticketsToCreate);
+
+  return { order, tickets };
+
 };

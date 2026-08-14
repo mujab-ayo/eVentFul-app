@@ -12,6 +12,9 @@ const orderSchema = new Schema(
       ref: "User",
       required: true,
     },
+    paystackReference: {
+      type: String,
+    },
     totalAmount: {
       type: Number,
       required: true,
