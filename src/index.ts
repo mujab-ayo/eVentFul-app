@@ -5,6 +5,9 @@ import eventRoutes from "./routes/eventRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
 import ticketRoutes from "./routes/ticketRoutes.js"
 
+import redisClient from "./config/redis.js";
+import "./config/reminderWorker.js";
+
 import express from "express";
 const app = express();
 const PORT = process.env.PORT || 5000;
