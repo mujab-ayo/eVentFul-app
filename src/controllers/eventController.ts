@@ -314,31 +314,23 @@ export const getSharableEventController = async (
 
     return res.status(200).json(link);
   } catch (error) {
-    if (
-      error instanceof Error &&
-      error.message === "This user is not a collaborator"
-    ) {
+    if (error instanceof Error && error.message === "Event not found") {
       return res.status(404).json({ error: error.message });
     }
 
     if (
       error instanceof Error &&
-      error.message === "Only owners can add collaborators"
+      error.message === "BASE_URL is not configured"
     ) {
-      return res.status(403).json({ error: error.message });
-    }
-
-    if (
-      error instanceof Error &&
-      error.message === "Cannot delete the last remaining owner"
-    ) {
-      return res.status(409).json({ error: error.message });
+      return res.status(500).json({ error: error.message });
     }
 
     if (error instanceof Error) {
       return res.status(400).json({ error: error.message });
     }
 
-    return res.status(500).json({ error: "Internal Server Error" });
+    return res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
 };
