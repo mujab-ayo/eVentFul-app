@@ -36,4 +36,3 @@ Base URL: `https://eventful-app-re6o.onrender.com`
 - **Caching** — Frequently-read event data is cached in Redis to reduce database load.
 - **Rate Limiting** — Global request limits, with stricter limits on auth endpoints to reduce brute-force risk.
 
-## 📁 Project Structure
