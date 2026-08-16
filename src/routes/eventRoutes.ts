@@ -18,6 +18,11 @@ import {
 
 import {createReminderController} from "../controllers/reminderController.js"
 
+import {
+  getEventAnalyticsController,
+  getMyEventsAnalyticsController,
+} from "../controllers/analyticsController.js";
+
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -53,5 +58,9 @@ router.get("/:id/orders", authMiddleware, getOrdersForEventController);
 router.get("/:id/share", getSharableEventController);
 
 router.post("/:id/reminders", authMiddleware, createReminderController);
+
+router.get("/:id/analytics", authMiddleware, getEventAnalyticsController);
+
+router.get("/analytics/me", authMiddleware, getMyEventsAnalyticsController);
 
 export default router;

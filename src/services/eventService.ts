@@ -1,5 +1,6 @@
 import { type EventInput } from "../types/event.js";
 import Event from "../models/Event.js";
+import redisClient from "../config/redis.js";
 
 const createEvent = async (eventData: EventInput, creatorId: string) => {
   const event = await Event.create({
@@ -8,15 +9,28 @@ const createEvent = async (eventData: EventInput, creatorId: string) => {
     collaborators: [{ userId: creatorId, isOwner: true }],
   });
 
+  await redisClient.del("events:all");
+
   return event;
 };
 
 const getAllEvents = async () => {
-  const events = await Event.find();
-  return events;
+  const cacheKey = "events:all";
+  const cached = await redisClient.get(cacheKey);
+  if (cached === null) { 
+    const events = await Event.find();
+    await redisClient.set(cacheKey, JSON.stringify(events), "EX", 60);
+    return events;
+  }
+
+  return JSON.parse(cached)
 };
 
 const getEventById = async (eventId: string) => {
+   const cacheKey = `event:${eventId}`;
+   const cached = await redisClient.get(cacheKey);
+   
+   
   const event = await Event.findById(eventId);
 
   if (!event) {
@@ -45,6 +59,8 @@ const updateEvent = async (
 
   await event.save();
 
+  await redisClient.del("events:all");
+
   return event;
 };
 
@@ -60,6 +76,8 @@ const deleteEvent = async (eventId: string, id: string) => {
   }
 
   await Event.findByIdAndDelete(eventId);
+
+  await redisClient.del("events:all");
 
   return { message: "Event deleted successfully" };
 };
