@@ -8,11 +8,14 @@ const runId = Date.now();
 const email = `test-integration-auth-${runId}@example.com`;
 const password = "password123";
 
-describe("POST /auth/register", () => {
-  afterAll(async () => {
-    await User.deleteMany({ email: { $regex: /^test-integration-auth-/ } });
-  });
 
+ afterAll(async () => {
+   await User.deleteMany({ email: { $regex: /^test-integration-auth-/ } });
+ });
+
+
+describe("POST /auth/register", () => {
+ 
   it("registers a new user and returns 201 without leaking the password hash", async () => {
     const res = await request(app).post("/auth/register").send({
       name: "Integration Test User",
@@ -39,10 +42,12 @@ describe("POST /auth/register", () => {
 
 describe("POST /auth/login", () => {
     it("logs in successfully and returns a token", async () => {
-      console.log("LOGIN RESPONSE:", res.status, res.body);
-    const res = await request(app)
+        const res = await request(app)            
       .post("/auth/login")
-      .send({ email, password });
+            .send({ email, password });
+        
+       
+        
 
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty("token");
