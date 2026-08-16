@@ -10,7 +10,7 @@ Full API documentation (all endpoints, request/response examples) is published h
 
 ## 🚀 Live API
 
-Base URL: `https://eventful-app-re6o.onrender.com`
+Base URL: `https://eventful-app-re6o.onrender.com/events`
 
 ## 🛠️ Tech Stack
 
