@@ -16,6 +16,8 @@ import {
   getOrdersForEventController,
 } from "../controllers/orderController.js";
 
+import {createReminderController} from "../controllers/reminderController.js"
+
 import authMiddleware from "../middleware/authMiddleware.js";
 
 const router = Router();
@@ -49,5 +51,7 @@ router.post("/:id/orders", authMiddleware, createOrderController);
 router.get("/:id/orders", authMiddleware, getOrdersForEventController);
 
 router.get("/:id/share", getSharableEventController);
+
+router.post("/:id/reminders", authMiddleware, createReminderController);
 
 export default router;
